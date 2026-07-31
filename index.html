@@ -2,37 +2,42 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>이해충돌방지법 십자말풀이 - 확장판</title>
+  <title>이해충돌방지법 10대 행위기준 십자말풀이</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: 'Malgun Gothic', sans-serif; background-color: #f0f4f8; text-align: center; padding: 20px; }
-    h1 { color: #2c3e50; margin-bottom: 10px; }
-    .game-container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 750px; margin: 0 auto; }
+    body { font-family: 'Malgun Gothic', sans-serif; background-color: #f0f4f8; margin: 0; padding: 20px; text-align: center; color: #333; }
+    h1 { color: #2c3e50; margin-bottom: 10px; font-size: 24px; }
+    .game-container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 900px; margin: 0 auto; }
     
-    /* 상단 정보 (타이머, 점수) */
-    .header-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 20px; font-weight: bold; background: #e8f4f8; padding: 15px; border-radius: 8px; }
+    /* 상단 정보 */
+    .header-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 18px; font-weight: bold; background: #e8f4f8; padding: 15px; border-radius: 8px; }
     .timer { color: #e74c3c; }
     .score { color: #2980b9; }
 
-    /* 십자말풀이 테이블 */
-    table { border-collapse: collapse; margin: 0 auto 25px auto; background: #333; border: 2px solid #333; }
-    td { width: 45px; height: 45px; padding: 0; position: relative; background: #fff; }
-    td.empty { background: transparent; border: none; }
+    /* 십자말풀이 보드 */
+    .board-wrapper { overflow-x: auto; padding: 10px 0; margin-bottom: 20px; }
+    #board { display: grid; gap: 0; background: #2c3e50; padding: 2px; border-radius: 6px; width: max-content; margin: 0 auto; border: 2px solid #2c3e50; }
+    .cell { width: 38px; height: 38px; background: white; position: relative; border: 1px solid #ccc; box-sizing: border-box; }
+    .cell.empty { background: transparent; border: none; }
     
-    input { width: 100%; height: 100%; border: 1px solid #ccc; text-align: center; font-size: 20px; font-weight: bold; box-sizing: border-box; }
-    input:focus { outline: 3px solid #3498db; background-color: #e8f4f8; z-index: 10; position: relative; }
-    input:disabled { background-color: #f5f5f5; color: #aaa; cursor: not-allowed; }
+    .cell input { width: 100%; height: 100%; border: none; text-align: center; font-size: 18px; font-weight: bold; box-sizing: border-box; padding: 0; margin: 0; border-radius: 0; }
+    .cell input:focus { outline: 3px solid #3498db; background-color: #e8f4f8; z-index: 10; position: relative; }
+    .cell input:disabled { background-color: #f5f5f5; color: #888; cursor: not-allowed; }
     
-    .num { position: absolute; top: 2px; left: 4px; font-size: 11px; font-weight: bold; color: #555; pointer-events: none; z-index: 5; }
-    
+    .cell .num { position: absolute; top: 2px; left: 3px; font-size: 11px; font-weight: bold; color: #555; pointer-events: none; z-index: 5; }
+
     /* 힌트 영역 */
-    .clues-container { display: flex; flex-wrap: wrap; gap: 20px; text-align: left; line-height: 1.6; }
-    .clues { flex: 1; min-width: 300px; background: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #ddd; }
-    .clues h3 { color: #2980b9; margin-top: 0; border-bottom: 2px solid #3498db; padding-bottom: 5px; }
-    .clues p { margin: 10px 0; font-size: 15px; }
-    
+    .clues-container { display: flex; flex-direction: column; gap: 15px; text-align: left; line-height: 1.5; margin-top: 10px; }
+    @media (min-width: 768px) { .clues-container { flex-direction: row; } }
+    .clues { flex: 1; background: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #ddd; }
+    .clues h3 { color: #2980b9; margin-top: 0; border-bottom: 2px solid #3498db; padding-bottom: 8px; font-size: 18px; }
+    .clues ul { list-style: none; padding: 0; margin: 0; }
+    .clues li { margin-bottom: 12px; font-size: 14px; display: flex; }
+    .clues li strong { min-width: 28px; color: #e67e22; }
+
     /* 버튼 */
-    .btn-group { margin-top: 25px; }
-    button { color: white; border: none; padding: 14px 28px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; margin: 0 5px; transition: background 0.2s; }
+    .btn-group { margin: 20px 0; }
+    button { color: white; border: none; padding: 12px 24px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; margin: 0 5px; transition: background 0.2s; }
     #start-btn { background-color: #3498db; }
     #start-btn:hover { background-color: #2980b9; }
     #check-btn { background-color: #27ae60; }
@@ -43,218 +48,187 @@
 <body>
 
   <div class="game-container">
-    <h1>이해충돌방지법 십자말풀이</h1>
+    <h1>이해충돌방지법 10대 행위기준 마스터</h1>
     
     <div class="header-info">
-      <div class="timer">⏳ 남은 시간: <span id="time-display">3:00</span></div>
-      <div class="score">🏆 점수: <span id="score-display">0</span>점</div>
+      <div class="timer">⏳ <span id="time-display">5:00</span></div>
+      <div class="score">🏆 <span id="score-display">0</span>점</div>
     </div>
 
-    <!-- 7x7 십자말풀이 그리드 -->
-    <table>
-      <!-- Row 1 -->
-      <tr>
-        <td><span class="num">1</span><input type="text" maxlength="1" data-answer="사" disabled></td>
-        <td><input type="text" maxlength="1" data-answer="적" disabled></td>
-        <td><span class="num">2</span><input type="text" maxlength="1" data-answer="이" disabled></td>
-        <td><span class="num">4</span><input type="text" maxlength="1" data-answer="해" disabled></td>
-        <td><input type="text" maxlength="1" data-answer="관" disabled></td>
-        <td><span class="num">3</span><input type="text" maxlength="1" data-answer="계" disabled></td>
-        <td><input type="text" maxlength="1" data-answer="자" disabled></td>
-      </tr>
-      <!-- Row 2 -->
-      <tr>
-        <td class="empty"></td>
-        <td class="empty"></td>
-        <td><input type="text" maxlength="1" data-answer="해" disabled></td>
-        <td><input type="text" maxlength="1" data-answer="고" disabled></td>
-        <td class="empty"></td>
-        <td><input type="text" maxlength="1" data-answer="약" disabled></td>
-        <td class="empty"></td>
-      </tr>
-      <!-- Row 3 -->
-      <tr>
-        <td class="empty"></td>
-        <td class="empty"></td>
-        <td><input type="text" maxlength="1" data-answer="충" disabled></td>
-        <td class="empty"></td>
-        <td class="empty"></td>
-        <td class="empty"></td>
-        <td class="empty"></td>
-      </tr>
-      <!-- Row 4 -->
-      <tr>
-        <td class="empty"></td>
-        <td class="empty"></td>
-        <td><input type="text" maxlength="1" data-answer="돌" disabled></td>
-        <td class="empty"></td>
-        <td class="empty"></td>
-        <td class="empty"></td>
-        <td class="empty"></td>
-      </tr>
-      <!-- Row 5 -->
-      <tr>
-        <td class="empty"></td>
-        <td class="empty"></td>
-        <td><input type="text" maxlength="1" data-answer="방" disabled></td>
-        <td class="empty"></td>
-        <td class="empty"></td>
-        <td class="empty"></td>
-        <td class="empty"></td>
-      </tr>
-      <!-- Row 6 -->
-      <tr>
-        <td class="empty"></td>
-        <td><span class="num">5</span><input type="text" maxlength="1" data-answer="금" disabled></td>
-        <td><input type="text" maxlength="1" data-answer="지" disabled></td>
-        <td class="empty"></td>
-        <td class="empty"></td>
-        <td class="empty"></td>
-        <td class="empty"></td>
-      </tr>
-      <!-- Row 7 -->
-      <tr>
-        <td class="empty"></td>
-        <td class="empty"></td>
-        <td><input type="text" maxlength="1" data-answer="법" disabled></td>
-        <td class="empty"></td>
-        <td class="empty"></td>
-        <td class="empty"></td>
-        <td class="empty"></td>
-      </tr>
-    </table>
+    <div class="board-wrapper">
+      <div id="board"></div>
+    </div>
 
     <div class="btn-group">
       <button id="start-btn" onclick="startGame()">▶ 게임 시작하기</button>
-      <button id="check-btn" onclick="checkAnswers()" disabled>✔️ 정답 확인 및 점수 계산</button>
+      <button id="check-btn" onclick="checkAnswers()" disabled>✔️ 정답 확인</button>
     </div>
 
-    <!-- 힌트 영역 -->
     <div class="clues-container">
       <div class="clues">
         <h3>➡️ 가로 열쇠</h3>
-        <p><b>1.</b> 공직자가 직무를 수행할 때 얽힐 수 있는 가족, 친족, 이전 근무 기관 등을 통틀어 이르는 말 (7글자)</p>
-        <p><b>5.</b> 법이나 규칙 등으로 어떤 행위를 하지 못하게 막음. (예: 가족 채용 OO) (2글자)</p>
+        <ul id="clues-h"></ul>
       </div>
       <div class="clues">
         <h3>⬇️ 세로 열쇠</h3>
-        <p><b>2.</b> 공직자가 공정한 직무수행을 저해할 수 있는 사적인 이해관계와 부딪히는 상황을 막기 위해 제정된 법 (7글자)</p>
-        <p><b>3.</b> 공공기관이 소속 고위공직자의 가족 등과 특정 형태의 수의OO을 체결하는 것을 법으로 엄격히 제한합니다. (2글자)</p>
-        <p><b>4.</b> 공익신고자에게 불이익 조치를 내리는 대표적인 사례 중 하나로, 직장에서 강제로 쫓아내는 것 (2글자)</p>
+        <ul id="clues-v"></ul>
       </div>
     </div>
   </div>
 
   <script>
+    // 10대 행위기준 퍼즐 데이터 (자동 좌표 맵핑)
+    const puzzleData = [
+      { id: 1, dir: 'V', r: 1, c: 4, word: "업무활동", desc: "고위공직자가 임용 전 3년간 민간 부문에서 활동한 내역을 제출하는 의무 (민간부문 OOOO 내역 제출)" },
+      { id: 2, dir: 'H', r: 1, c: 7, word: "퇴직자", desc: "직무관련자인 소속 기관의 이 사람과 골프, 여행 등 사적으로 접촉할 경우 신고해야 하는 의무" },
+      { id: 3, dir: 'H', r: 3, c: 2, word: "외부활동", desc: "공직자가 직무와 관련된 지식을 제공하고 대가를 받는 등 직무 수행에 지장을 주는 활동 제한" },
+      { id: 4, dir: 'V', r: 3, c: 3, word: "부동산", desc: "공공기관 직무와 관련된 이것을 보유하거나 매수할 때 신고해야 하는 의무" },
+      { id: 5, dir: 'H', r: 8, c: 10, word: "직무상비밀", desc: "공직자가 직무수행 중 알게 된 미공개 정보를 이용하여 재산상 이익을 취하는 행위 금지" },
+      { id: 5, dir: 'V', r: 8, c: 10, word: "직무관련자", desc: "공직자의 직무 수행과 관련하여 이익 또는 불이익을 직접적으로 받는 자 (거래 신고 의무)" },
+      { id: 6, dir: 'V', r: 10, c: 9, word: "수의계약", desc: "공공기관이 소속 고위공직자의 가족 등과 경쟁 없이 맺는 특정 형태의 계약 체결 제한" },
+      { id: 7, dir: 'H', r: 12, c: 4, word: "사적이해관계자", desc: "공직자가 직무를 수행할 때 얽힐 수 있는 가족, 친족 등을 통틀어 이르는 말 (신고 및 회피 의무)" },
+      { id: 7, dir: 'V', r: 12, c: 4, word: "사적사용", desc: "공공기관의 물품, 차량, 시설 등을 개인적인 용도로 사용하거나 수익하는 행위 금지" },
+      { id: 8, dir: 'H', r: 15, c: 1, word: "가족채용", desc: "공공기관이 소속 고위공직자의 친족을 채용하는 것을 제한하는 의무" }
+    ];
+
+    const ROWS = 16, COLS = 16;
+    let grid = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+    
+    const boardEl = document.getElementById('board');
+    const cluesHEl = document.getElementById('clues-h');
+    const cluesVEl = document.getElementById('clues-v');
+
+    // 그리드 생성 로직
+    function buildGrid() {
+      boardEl.style.gridTemplateColumns = `repeat(${COLS}, 38px)`;
+      boardEl.style.gridTemplateRows = `repeat(${ROWS}, 38px)`;
+
+      // 데이터 맵핑
+      puzzleData.forEach(item => {
+        let r = item.r;
+        let c = item.c;
+        for (let i = 0; i < item.word.length; i++) {
+          if (!grid[r][c]) grid[r][c] = { char: item.word[i], num: null };
+          if (i === 0) grid[r][c].num = item.id;
+          
+          item.dir === 'H' ? c++ : r++;
+        }
+
+        // 힌트 리스트 생성
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${item.id}.</strong> ${item.desc}`;
+        if (item.dir === 'H') cluesHEl.appendChild(li);
+        else cluesVEl.appendChild(li);
+      });
+
+      // HTML 요소 생성
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const cellData = grid[r][c];
+          const div = document.createElement('div');
+          
+          if (cellData) {
+            div.className = 'cell';
+            if (cellData.num) {
+              const span = document.createElement('span');
+              span.className = 'num';
+              span.textContent = cellData.num;
+              div.appendChild(span);
+            }
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.maxLength = 1;
+            input.dataset.answer = cellData.char;
+            input.disabled = true;
+            div.appendChild(input);
+          } else {
+            div.className = 'cell empty';
+          }
+          boardEl.appendChild(div);
+        }
+      }
+    }
+    buildGrid();
+
+    // 게임 로직
     let timerInterval;
-    let timeLeft = 180; // 3분 (180초)
+    let timeLeft = 300; // 5분
     let isGameRunning = false;
     let score = 0;
-
-    const timerDisplay = document.getElementById('time-display');
-    const scoreDisplay = document.getElementById('score-display');
     const inputs = document.querySelectorAll('input');
-    const startBtn = document.getElementById('start-btn');
-    const checkBtn = document.getElementById('check-btn');
 
-    // 디스플레이 업데이트 함수
     function updateDisplay() {
-      const minutes = Math.floor(timeLeft / 60);
-      const seconds = timeLeft % 60;
-      timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-      scoreDisplay.textContent = score;
+      document.getElementById('time-display').textContent = `${Math.floor(timeLeft / 60)}:${(timeLeft % 60).toString().padStart(2, '0')}`;
+      document.getElementById('score-display').textContent = score;
     }
 
-    // 게임 시작 함수
     function startGame() {
       if (isGameRunning) return;
-      
       isGameRunning = true;
-      timeLeft = 180;
+      timeLeft = 300;
       score = 0;
       updateDisplay();
 
-      // 입력창 활성화 및 초기화
       inputs.forEach(input => {
         input.disabled = false;
         input.value = '';
-        input.style.backgroundColor = '#fff';
-        input.style.color = '#000';
+        input.style.backgroundColor = 'white';
+        input.style.color = 'black';
       });
 
-      // 버튼 상태 변경
-      startBtn.disabled = true;
-      startBtn.textContent = '게임 진행 중...';
-      checkBtn.disabled = false;
+      document.getElementById('start-btn').disabled = true;
+      document.getElementById('start-btn').textContent = '진행 중...';
+      document.getElementById('check-btn').disabled = false;
 
-      // 타이머 시작
       timerInterval = setInterval(() => {
         timeLeft--;
         updateDisplay();
-        
-        if (timeLeft <= 0) {
-          endGame(false); // 시간 초과 시 게임 종료
-        }
+        if (timeLeft <= 0) endGame(false);
       }, 1000);
     }
 
-    // 정답 확인 함수
     function checkAnswers() {
       if (!isGameRunning) return;
-
       let correctCount = 0;
       let allCorrect = true;
 
       inputs.forEach(input => {
         if (!input.value) {
-            allCorrect = false;
-            input.style.backgroundColor = '#fff'; // 빈칸은 흰색 유지
+          allCorrect = false;
+          input.style.backgroundColor = 'white';
         } else if (input.value === input.dataset.answer) {
-          input.style.backgroundColor = '#d4edda'; // 정답(초록)
+          input.style.backgroundColor = '#d4edda';
           input.style.color = '#155724';
           correctCount++;
         } else {
-          input.style.backgroundColor = '#f8d7da'; // 오답(빨강)
+          input.style.backgroundColor = '#f8d7da';
           input.style.color = '#721c24';
           allCorrect = false;
         }
       });
 
-      // 정답 글자수 * 10점
       score = correctCount * 10;
       updateDisplay();
 
-      if (allCorrect) {
-        endGame(true); // 모두 맞췄을 때 게임 종료
-      }
+      if (allCorrect) endGame(true);
     }
 
-    // 게임 종료 처리 함수
     function endGame(isSuccess) {
       clearInterval(timerInterval);
       isGameRunning = false;
-      
-      // 입력창 잠금
       inputs.forEach(input => input.disabled = true);
       
-      // 버튼 상태 원상복구
-      startBtn.disabled = false;
-      startBtn.textContent = '▶ 다시 시작하기';
-      checkBtn.disabled = true;
+      document.getElementById('start-btn').disabled = false;
+      document.getElementById('start-btn').textContent = '▶ 다시 시작하기';
+      document.getElementById('check-btn').disabled = true;
 
       if (isSuccess) {
-        // 남은 시간 1초당 5점의 보너스 추가
-        const timeBonus = timeLeft * 5;
-        score += timeBonus;
+        const bonus = timeLeft * 5;
+        score += bonus;
         updateDisplay();
-        
-        setTimeout(() => {
-          alert(`🎉 완벽합니다! 최종 점수: ${score}점\n(기본 점수 + 남은 시간 보너스 ${timeBonus}점)`);
-        }, 100);
+        setTimeout(() => alert(`🎉 완벽합니다! 최종 점수: ${score}점\n(기본 점수 + 남은 시간 보너스 ${bonus}점)`), 100);
       } else {
-        setTimeout(() => {
-          alert(`⏰ 시간이 초과되었습니다. 최종 점수: ${score}점\n'다시 시작하기'를 눌러 재도전해 보세요!`);
-        }, 100);
+        setTimeout(() => alert(`⏰ 시간이 초과되었습니다. 최종 점수: ${score}점`), 100);
       }
     }
   </script>
