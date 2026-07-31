@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>이해충돌방지법 10대 행위기준 십자말풀이</title>
+  <title>이해충돌방지법 10x10 십자말풀이</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body { font-family: 'Malgun Gothic', sans-serif; background-color: #f0f4f8; margin: 0; padding: 20px; text-align: center; color: #333; }
@@ -17,14 +17,16 @@
     /* 십자말풀이 보드 */
     .board-wrapper { overflow-x: auto; padding: 10px 0; margin-bottom: 20px; }
     #board { display: grid; gap: 0; background: #2c3e50; padding: 2px; border-radius: 6px; width: max-content; margin: 0 auto; border: 2px solid #2c3e50; }
-    .cell { width: 38px; height: 38px; background: white; position: relative; border: 1px solid #ccc; box-sizing: border-box; }
+    
+    /* 10x10에 맞게 셀 크기를 45px로 약간 키웠습니다 */
+    .cell { width: 45px; height: 45px; background: white; position: relative; border: 1px solid #ccc; box-sizing: border-box; }
     .cell.empty { background: transparent; border: none; }
     
-    .cell input { width: 100%; height: 100%; border: none; text-align: center; font-size: 18px; font-weight: bold; box-sizing: border-box; padding: 0; margin: 0; border-radius: 0; }
+    .cell input { width: 100%; height: 100%; border: none; text-align: center; font-size: 20px; font-weight: bold; box-sizing: border-box; padding: 0; margin: 0; border-radius: 0; }
     .cell input:focus { outline: 3px solid #3498db; background-color: #e8f4f8; z-index: 10; position: relative; }
     .cell input:disabled { background-color: #f5f5f5; color: #888; cursor: not-allowed; }
     
-    .cell .num { position: absolute; top: 2px; left: 3px; font-size: 11px; font-weight: bold; color: #555; pointer-events: none; z-index: 5; }
+    .cell .num { position: absolute; top: 2px; left: 4px; font-size: 12px; font-weight: bold; color: #555; pointer-events: none; z-index: 5; }
 
     /* 힌트 영역 */
     .clues-container { display: flex; flex-direction: column; gap: 15px; text-align: left; line-height: 1.5; margin-top: 10px; }
@@ -61,7 +63,7 @@
 
     <div class="btn-group">
       <button id="start-btn" onclick="startGame()">▶ 게임 시작하기</button>
-      <button id="check-btn" onclick="checkAnswers()" disabled>✔️ 정답 확인</button>
+      <button id="check-btn" onclick="checkAnswers()" disabled>✔️ 정답 확인 (남은 빈칸 공개)</button>
     </div>
 
     <div class="clues-container">
@@ -77,31 +79,31 @@
   </div>
 
   <script>
-    // 10대 행위기준 퍼즐 데이터 (자동 좌표 맵핑)
+    // 10x10 사이즈에 맞춘 최적화된 퍼즐 데이터 배치
     const puzzleData = [
-      { id: 1, dir: 'V', r: 1, c: 4, word: "업무활동", desc: "고위공직자가 임용 전 3년간 민간 부문에서 활동한 내역을 제출하는 의무 (민간부문 OOOO 내역 제출)" },
-      { id: 2, dir: 'H', r: 1, c: 7, word: "퇴직자", desc: "직무관련자인 소속 기관의 이 사람과 골프, 여행 등 사적으로 접촉할 경우 신고해야 하는 의무" },
-      { id: 3, dir: 'H', r: 3, c: 2, word: "외부활동", desc: "공직자가 직무와 관련된 지식을 제공하고 대가를 받는 등 직무 수행에 지장을 주는 활동 제한" },
-      { id: 4, dir: 'V', r: 3, c: 3, word: "부동산", desc: "공공기관 직무와 관련된 이것을 보유하거나 매수할 때 신고해야 하는 의무" },
-      { id: 5, dir: 'H', r: 8, c: 10, word: "직무상비밀", desc: "공직자가 직무수행 중 알게 된 미공개 정보를 이용하여 재산상 이익을 취하는 행위 금지" },
-      { id: 5, dir: 'V', r: 8, c: 10, word: "직무관련자", desc: "공직자의 직무 수행과 관련하여 이익 또는 불이익을 직접적으로 받는 자 (거래 신고 의무)" },
-      { id: 6, dir: 'V', r: 10, c: 9, word: "수의계약", desc: "공공기관이 소속 고위공직자의 가족 등과 경쟁 없이 맺는 특정 형태의 계약 체결 제한" },
-      { id: 7, dir: 'H', r: 12, c: 4, word: "사적이해관계자", desc: "공직자가 직무를 수행할 때 얽힐 수 있는 가족, 친족 등을 통틀어 이르는 말 (신고 및 회피 의무)" },
-      { id: 7, dir: 'V', r: 12, c: 4, word: "사적사용", desc: "공공기관의 물품, 차량, 시설 등을 개인적인 용도로 사용하거나 수익하는 행위 금지" },
-      { id: 8, dir: 'H', r: 15, c: 1, word: "가족채용", desc: "공공기관이 소속 고위공직자의 친족을 채용하는 것을 제한하는 의무" }
+      { id: 1, dir: 'H', r: 2, c: 3, word: "사적이해관계자", desc: "공직자가 직무를 수행할 때 얽힐 수 있는 가족, 친족 등을 통틀어 이르는 말 (신고 및 회피 의무)" },
+      { id: 1, dir: 'V', r: 2, c: 3, word: "사적사용", desc: "공공기관의 물품, 차량, 시설 등을 개인적인 용도로 사용하거나 수익하는 행위 금지" },
+      { id: 2, dir: 'V', r: 0, c: 8, word: "수의계약", desc: "공공기관이 소속 고위공직자의 가족 등과 경쟁 없이 맺는 특정 형태의 계약 체결 제한" },
+      { id: 3, dir: 'V', r: 0, c: 7, word: "직무관련자", desc: "공직자의 직무 수행과 관련하여 이익 또는 불이익을 직접적으로 받는 자 (거래 신고 의무)" },
+      { id: 4, dir: 'H', r: 5, c: 0, word: "가족채용", desc: "공공기관이 소속 고위공직자의 친족을 채용하는 것을 제한하는 의무" },
+      { id: 5, dir: 'H', r: 4, c: 5, word: "퇴직자", desc: "직무관련자인 소속 기관의 이 사람과 골프, 여행 등 사적으로 접촉할 경우 신고해야 하는 의무" },
+      { id: 6, dir: 'V', r: 4, c: 6, word: "직무상비밀", desc: "공직자가 직무수행 중 알게 된 미공개 정보를 이용하여 재산상 이익을 취하는 행위 금지" },
+      { id: 7, dir: 'V', r: 6, c: 2, word: "외부활동", desc: "공직자가 직무와 관련된 지식을 제공하고 대가를 받는 등 직무 수행에 지장을 주는 활동 제한" },
+      { id: 8, dir: 'H', r: 7, c: 2, word: "부동산", desc: "공공기관 직무와 관련된 이것을 보유하거나 매수할 때 신고해야 하는 의무" },
+      { id: 9, dir: 'H', r: 8, c: 0, word: "업무활동", desc: "고위공직자가 임용 전 3년간 민간 부문에서 활동한 내역을 제출하는 의무 (민간부문 OOOO 내역 제출)" }
     ];
 
-    const ROWS = 16, COLS = 16;
+    // 10x10 그리드 설정
+    const ROWS = 10, COLS = 10;
     let grid = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
     
     const boardEl = document.getElementById('board');
     const cluesHEl = document.getElementById('clues-h');
     const cluesVEl = document.getElementById('clues-v');
 
-    // 그리드 생성 로직
     function buildGrid() {
-      boardEl.style.gridTemplateColumns = `repeat(${COLS}, 38px)`;
-      boardEl.style.gridTemplateRows = `repeat(${ROWS}, 38px)`;
+      boardEl.style.gridTemplateColumns = `repeat(${COLS}, 45px)`;
+      boardEl.style.gridTemplateRows = `repeat(${ROWS}, 45px)`;
 
       // 데이터 맵핑
       puzzleData.forEach(item => {
@@ -109,7 +111,7 @@
         let c = item.c;
         for (let i = 0; i < item.word.length; i++) {
           if (!grid[r][c]) grid[r][c] = { char: item.word[i], num: null };
-          if (i === 0) grid[r][c].num = item.id;
+          if (i === 0 && !grid[r][c].num) grid[r][c].num = item.id;
           
           item.dir === 'H' ? c++ : r++;
         }
@@ -187,49 +189,53 @@
       }, 1000);
     }
 
+    // ★ 개선된 정답 확인 함수 (틀린/빈칸에 정답 공개)
     function checkAnswers() {
       if (!isGameRunning) return;
+      
+      clearInterval(timerInterval); // 즉시 타이머 정지
+      isGameRunning = false;
+      
       let correctCount = 0;
       let allCorrect = true;
 
       inputs.forEach(input => {
-        if (!input.value) {
-          allCorrect = false;
-          input.style.backgroundColor = 'white';
-        } else if (input.value === input.dataset.answer) {
+        // 맞춘 경우
+        if (input.value === input.dataset.answer) {
           input.style.backgroundColor = '#d4edda';
           input.style.color = '#155724';
           correctCount++;
-        } else {
+        } 
+        // 틀렸거나 비어있는 경우
+        else {
+          allCorrect = false;
+          input.value = input.dataset.answer; // 정답 강제 기입
           input.style.backgroundColor = '#f8d7da';
           input.style.color = '#721c24';
-          allCorrect = false;
         }
+        input.disabled = true; // 입력 잠금
       });
 
       score = correctCount * 10;
-      updateDisplay();
-
-      if (allCorrect) endGame(true);
-    }
-
-    function endGame(isSuccess) {
-      clearInterval(timerInterval);
-      isGameRunning = false;
-      inputs.forEach(input => input.disabled = true);
       
       document.getElementById('start-btn').disabled = false;
       document.getElementById('start-btn').textContent = '▶ 다시 시작하기';
       document.getElementById('check-btn').disabled = true;
 
-      if (isSuccess) {
+      if (allCorrect) {
         const bonus = timeLeft * 5;
         score += bonus;
         updateDisplay();
         setTimeout(() => alert(`🎉 완벽합니다! 최종 점수: ${score}점\n(기본 점수 + 남은 시간 보너스 ${bonus}점)`), 100);
       } else {
-        setTimeout(() => alert(`⏰ 시간이 초과되었습니다. 최종 점수: ${score}점`), 100);
+        updateDisplay();
+        setTimeout(() => alert(`💡 아쉽습니다! 비어있거나 틀린 칸에 정답을 표시해 드렸습니다.\n최종 점수: ${score}점`), 100);
       }
+    }
+
+    function endGame(isSuccess) {
+      if (!isGameRunning) return;
+      checkAnswers(); // 시간 초과 시에도 강제로 정답 확인 함수를 호출하여 화면을 공개합니다.
     }
   </script>
 </body>
